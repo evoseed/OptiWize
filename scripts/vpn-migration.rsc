@@ -30,5 +30,3 @@ add name=vpn-migration source="\
     \n    /interface ovpn-client\
     \n    set [find name=orchestrator] disabled=yes\
     \n}"
-/system scheduler
-add name=run-vpn-migration on-event="/system script run vpn-migration" start-time=startup delay=1s
