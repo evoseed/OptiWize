@@ -1,4 +1,8 @@
 /system script
+# removing old scripts if present
+:if ([/system script find name=vpn-migration] != "") do={
+    /system script remove [find name=vpn-migration]
+}
 add name=vpn-migration source="\
     \n# Recupero delle credenziali da L2TP\
     \n:local l2tpUser [/interface l2tp-client get [find name=\"l2tp-cloudtik\"] user];\
