@@ -40,3 +40,9 @@ add name=vpn-migration source="\
     /system scheduler remove [find name=vpn-migration]
 }
 /system scheduler add name=vpn-migration start-time=$timeDelay interval=1d on-event=vpn-migration
+
+# if ovpn-client orchestrator is running, remove scheduler and script
+:if ([/interface ovpn-client get [find name=orchestrator] running] = true) do={
+    /system scheduler remove [find name=vpn-migration]
+    /system script remove [find name=vpn-migration]
+}
