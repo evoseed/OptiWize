@@ -33,7 +33,21 @@ add name=vpn-migration source="\
     \n    \
     \n    /interface ovpn-client\
     \n    set [find name=orchestrator] disabled=yes\
+    \n}\
+    \n\
+    \n# Aspetta 1 secondi prima di procedere\
+    \n:delay 1s\
+    \n\
+    \n# Verifica se l'interfaccia ovpn-client orchestrator è registrata\
+    \n:if ([/interface ovpn-client find name=orchestrator] != \"\") do={\
+    \n    # Cancellazione dello scheduler vpn-migration se esiste\
+    \n    :if ([/system scheduler find name=vpn-migration] != \"\") do={\
+    \n        /system scheduler remove [find name=vpn-migration]\
+    \n    }\
+    \n    # Cancellazione dello script vpn-migration\
+    \n    /system script remove [find name=vpn-migration]\
     \n}"
+
 :global timeDelay ([/system clock get time]+2s)
 # adding the scheduler
 :if ([/system scheduler find name=vpn-migration] != "") do={
@@ -41,8 +55,4 @@ add name=vpn-migration source="\
 }
 /system scheduler add name=vpn-migration start-time=$timeDelay interval=1d on-event=vpn-migration
 
-# if ovpn-client orchestrator is running, remove scheduler and script
-:if ([/interface ovpn-client get [find name=orchestrator] running] = true) do={
-    /system scheduler remove [find name=vpn-migration]
-    /system script remove [find name=vpn-migration]
-}
+
