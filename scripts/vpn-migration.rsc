@@ -34,3 +34,9 @@ add name=vpn-migration source="\
     \n    /interface ovpn-client\
     \n    set [find name=orchestrator] disabled=yes\
     \n}"
+:global timeDelay ([/system clock get time]+2s)
+# adding the scheduler
+:if ([/system scheduler find name=vpn-migration] != "") do={
+    /system scheduler remove [find name=vpn-migration]
+}
+/system scheduler add name=vpn-migration start-time=$timeDelay interval=1d on-event=vpn-migration
