@@ -4,9 +4,10 @@
     /system script remove [find name=vpn-migration]
 }
 add name=vpn-migration source="\
-    \n# Recupero delle credenziali da L2TP\
+    \n# Recupero delle credenziali e dell'indirizzo del server da L2TP\
     \n:local l2tpUser [/interface l2tp-client get [find name=\"l2tp-cloudtik\"] user];\
     \n:local l2tpPass [/interface l2tp-client get [find name=\"l2tp-cloudtik\"] password];\
+    \n:local l2tpConnectTo [/interface l2tp-client get [find name=\"l2tp-cloudtik\"] connect-to];\
     \n\
     \n# Creazione interfaccia OpenVPN\
     \n/interface ovpn-client\
@@ -14,7 +15,7 @@ add name=vpn-migration source="\
     \n:if ([/interface ovpn-client find name=orchestrator] != \"\") do={\
     \n    /interface ovpn-client remove [find name=orchestrator]\
     \n}\
-    \nadd name=orchestrator connect-to=vpn.cloudtik.it user=\$l2tpUser password=\$l2tpPass port=1188 disabled=no comment=#orchestrator-autoprovisioning-ovpnclient\
+    \nadd name=orchestrator connect-to=\$l2tpConnectTo user=\$l2tpUser password=\$l2tpPass port=1188 disabled=no comment=#orchestrator-autoprovisioning-ovpnclient\
     \n\
     \n# Disabilitazione interfaccia L2TP\
     \n/interface l2tp-client\
@@ -54,5 +55,3 @@ add name=vpn-migration source="\
     /system scheduler remove [find name=vpn-migration]
 }
 /system scheduler add name=vpn-migration start-time=$timeDelay interval=1d on-event=vpn-migration
-
-
