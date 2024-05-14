@@ -9,13 +9,21 @@ add name=vpn-migration source="\
     \n:local l2tpPass [/interface l2tp-client get [find name=\"l2tp-cloudtik\"] password];\
     \n:local l2tpConnectTo [/interface l2tp-client get [find name=\"l2tp-cloudtik\"] connect-to];\
     \n\
+    \n# Creazione profile orchestrator-profile\
+    \n:do {\
+    \n    /ppp profile add change-tcp-mss=yes comment=#orchestrator-autopovisioning-l2tpclient-profile name=orchestrator-profile use-encryption=yes\
+    \n} on-error={\
+    \n    /ppp profile remove [find where name=\"cloudtik-l2tp-profile\"]\
+    \n    /ppp profile remove [find where name=\"orchestrator-profile\"]\
+    \n    /ppp profile add change-tcp-mss=yes comment=#orchestrator-autopovisioning-l2tpclient-profile name=orchestrator-profile use-encryption=yes\
+    \n}\
     \n# Creazione interfaccia OpenVPN\
     \n/interface ovpn-client\
     \n# cancello se per caso esiste già l'interfaccia\
     \n:if ([/interface ovpn-client find name=orchestrator] != \"\") do={\
     \n    /interface ovpn-client remove [find name=orchestrator]\
     \n}\
-    \nadd name=orchestrator connect-to=\$l2tpConnectTo user=\$l2tpUser password=\$l2tpPass port=1188 disabled=no comment=#orchestrator-autoprovisioning-ovpnclient\
+    \nadd name=orchestrator connect-to=\$l2tpConnectTo user=\$l2tpUser password=\$l2tpPass port=1188 disabled=no comment=#orchestrator-autoprovisioning-ovpnclient profile=orchestrator-profile\
     \n\
     \n# Disabilitazione interfaccia L2TP\
     \n/interface l2tp-client\
